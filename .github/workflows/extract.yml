@@ -1,0 +1,26 @@
+name: The Post article extractor
+on:
+  schedule:
+    - cron: '1,31 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['extract.py', 'requirements.txt', '.github/workflows/extract.yml']
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: thepost-article-extractor
+  cancel-in-progress: false
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install free extractor
+        run: python3 -m pip install -r requirements.txt
+      - name: Extract the saved news batch
+        run: python3 extract.py
